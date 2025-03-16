@@ -2,12 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cyberpunk AI Chat Interface</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Hide Default Cursor */
+        body {
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: #00ffcc;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 40px #00ffcc;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            z-index: 10000;
+        }
+
+        /* Cursor Hover Effect */
+        .cyber-glow:hover ~ .custom-cursor {
+            width: 30px;
+            height: 30px;
+            background: #ff00ff;
+            box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff, 0 0 60px #ff00ff;
+        }
+
         /* Cyberpunk Background Animation */
         body {
             background: #0a0a0a;
@@ -74,8 +103,10 @@
         /* Chat Container */
         .chat-container {
             position: relative;
-            width: 400px;
-            height: 500px; /* Reduced height */
+            width: 90vw; /* Responsive width */
+            max-width: 400px; /* Max width for larger screens */
+            height: 80vh; /* Responsive height */
+            max-height: 600px; /* Max height for larger screens */
             border: 2px solid #00ffcc;
             border-radius: 12px;
             overflow: hidden;
@@ -107,9 +138,9 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 32px;
+            height: 40px; /* Increased height to cover branding */
             background: rgb(0, 0, 0);
-            z-index: 1000;
+            z-index: 1000; /* Ensure it's above the iframe */
         }
 
         /* Online Status Indicator */
@@ -181,9 +212,28 @@
             border-radius: 4px;
             box-shadow: 0 0 5px #00ffcc;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .chat-container {
+                width: 95vw; /* Wider on small screens */
+                height: 70vh; /* Shorter height for mobile */
+            }
+
+            h1 {
+                font-size: 1.5rem; /* Smaller heading for mobile */
+            }
+
+            .chat-header {
+                padding: 8px; /* Smaller padding for mobile */
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+
     <!-- Matrix Background -->
     <div class="matrix-bg"></div>
 
@@ -197,7 +247,7 @@
         </div>
     </header>
 
-    <main class="flex-grow flex items-center justify-center px-4 py-4"> <!-- Reduced padding -->
+    <main class="flex-grow flex items-center justify-center px-4 py-4">
         <div class="w-full max-w-4xl bg-gray-900 rounded-lg shadow-2xl cyber-glow">
             <div class="chat-header p-4 border-b border-gray-700 flex items-center justify-between">
                 <div class="flex items-center">
@@ -214,34 +264,65 @@
             <!-- Botpress Chatbot Block -->
             <h1 class="text-center text-xl font-semibold mt-4 font-orbitron">Can You Impress Me?</h1>
             <div class="chat-container">
-                <iframe src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/03/15/08/20250315081250-BT8YZD3Y.json" width="400" height="500" frameborder="0"></iframe>
+                <iframe src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/03/15/08/20250315081250-BT8YZD3Y.json" width="100%" height="100%" frameborder="0"></iframe>
                 <div class="branding-overlay"></div>
             </div>
         </div>
     </main>
 
     <footer class="bg-gray-900 border-t border-gray-700">
-        <div class="max-w-8xl mx-auto px-4 py-2 text-center"> <!-- Reduced padding -->
+        <div class="max-w-8xl mx-auto px-4 py-2 text-center">
             <p class="text-sm text-gray-400 font-orbitron">© 2024 Cyber AI Chat. All rights reserved.</p>
         </div>
     </footer>
 
     <!-- Sound Effects -->
-    <audio id="hover-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-hover-click-notification-2586.mp3"></audio>
-    <audio id="click-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-click-button-1120.mp3"></audio>
+    <audio id="hover-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-hover-click-notification-2586.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="click-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-button-1120.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <script>
+        // Custom Cursor Logic
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.pageX}px`;
+            cursor.style.top = `${e.pageY}px`;
+        });
+
+        // Ensure audio plays only after user interaction
+        let isAudioEnabled = false;
+
+        // Enable audio on user interaction
+        document.addEventListener('click', () => {
+            if (!isAudioEnabled) {
+                isAudioEnabled = true;
+                hoverSound.play().then(() => hoverSound.pause()); // Preload audio
+                clickSound.play().then(() => clickSound.pause()); // Preload audio
+            }
+        });
+
         // Play sound on hover
         const cyberGlow = document.querySelector('.cyber-glow');
         const hoverSound = document.getElementById('hover-sound');
         const clickSound = document.getElementById('click-sound');
 
         cyberGlow.addEventListener('mouseenter', () => {
-            hoverSound.play();
+            if (isAudioEnabled) {
+                hoverSound.currentTime = 0; // Reset audio to start
+                hoverSound.play();
+            }
         });
 
         cyberGlow.addEventListener('click', () => {
-            clickSound.play();
+            if (isAudioEnabled) {
+                clickSound.currentTime = 0; // Reset audio to start
+                clickSound.play();
+            }
         });
 
         // Simulate typing indicator
